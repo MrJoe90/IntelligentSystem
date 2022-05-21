@@ -111,7 +111,6 @@ class SudokuApp:
                 self.show_result.configure(text="Please enter a minimum of four unique letters.")
             elif len(words) > 4:
                 self.show_result.configure(text="Please enter a maximum of four unique letters.")
-                self.missing_error.place(relx=0.5, y=350, anchor=CENTER)
             else:
                 pass
 

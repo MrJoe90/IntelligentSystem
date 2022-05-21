@@ -20,10 +20,15 @@ class SudokuApp:
         self.pixelVirtual = PhotoImage(width=1, height=1)
 
         # Add title to application
-        self.label_one = Label(window, text="Enter a four letter word into the grid...",
-                               fg='black', font=("Helvetica", 10),
-                               image=self.pixelVirtual, height=30,
-                               width=400, compound="c")
+        self.label_one = Label(window,
+                               text="Enter four letter word into the grid...",
+                               fg='black',
+                               font=("Helvetica", 10),
+                               image=self.pixelVirtual,
+                               height=30,
+                               width=400,
+                               compound="c")
+
         self.label_one.place(x=100, y=30)
 
         # Create and place input boxes
@@ -50,12 +55,12 @@ class SudokuApp:
                   (self.input_9, self.input_10, self.input_11, self.input_12),
                   (self.input_13, self.input_14, self.input_15, self.input_16)]
 
-        x=220
-        y=100
+        x = 220
+        y = 100
         for i in range(4):
             for j in range(4):
                 self.table = inputs[i][j]
-                self.table.place(x= x + i * 40, y= y + j * 40)
+                self.table.place(x=x+i*40, y=y+j*40)
 
         # Generate the result from the grid
         def generateSudoku():
@@ -77,19 +82,22 @@ class SudokuApp:
             input_14 = self.input_14.get(1.0, "end-1c")
             input_15 = self.input_15.get(1.0, "end-1c")
             input_16 = self.input_16.get(1.0, "end-1c")
-            coords = [[input_1,0,0], [input_2,1,0], [input_3,2,0], [input_4,3,0],
-                     [input_5,0,1], [input_6,1,1], [input_7,2,1], [input_8,3,1],
-                     [input_9,0,2], [input_10,1,2], [input_11,2,2], [input_12,3,2],
-                     [input_13,0,3], [input_14,1,3], [input_15,2,3], [input_16,3,3]]
+            coords = [[input_1, 0, 0], [input_2, 1, 0],
+                      [input_3, 2, 0], [input_4, 3, 0],
+                      [input_5, 0, 1], [input_6, 1, 1],
+                      [input_7, 2, 1], [input_8, 3, 1],
+                      [input_9, 0, 2], [input_10, 1, 2],
+                      [input_11, 2, 2], [input_12, 3, 2],
+                      [input_13, 0, 3], [input_14, 1, 3],
+                      [input_15, 2, 3], [input_16, 3, 3]]
 
             def getWords(list):
-                return [item[0] for item in list]
-            
+                return [item[0] for item in list if item[0] != '']
+
             def getPositions(list):
                 return [item for item in list if item[0] != '']
-            
+
             words = getWords(coords)
-            words = list(filter(None, words))
             positions = getPositions(coords)
 
             initial = [Box(positions[0][1], positions[0][2], positions[0][0]),
@@ -105,8 +113,6 @@ class SudokuApp:
         self.submit_button.place(relx=0.5, y=300, anchor=CENTER)
         self.show_result = Label(window, text="")
         self.show_result.place(relx=0.5, y=350, anchor=CENTER)
-        
-
 
 root = Tk()
 app = SudokuApp(root)

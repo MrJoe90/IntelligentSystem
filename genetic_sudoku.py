@@ -1,7 +1,7 @@
-from concurrent.futures import thread
 import threading
 import random
 from collections import namedtuple
+import time
 
 Box = namedtuple('Box', "x y value")
 
@@ -17,7 +17,7 @@ class SudokuGeneticRepresentation:
         self._data = []
         self._position_fixed = initial_configuration
         for i in range(0, 4):
-            self._data.append([random.choice(words) for j in range(0, 4)])
+            self._data.append(random.sample(words, k=4))
         # Assuming a correct input --another type error should be raised here.
         for element in initial_configuration:
             self._data[element.x][element.y] = element.value
@@ -61,6 +61,12 @@ class SudokuGeneticRepresentation:
                 for k in range(i+1, self._data[i].__len__()):
                     if self._data[j][i] == self._data[k][i]:
                         col_violated += 1
+        # if row_violated <= 3 and col_violated <= 3:
+        if row_violated > 1 and col_violated > 1:
+            if row_violated+sub_matrix_violated >= col_violated+sub_matrix_violated:
+                return row_violated+sub_matrix_violated
+            else:
+                return col_violated+sub_matrix_violated
 
         # Check by sub-matrix
         if self._data[0][0] == self._data[1][1] or \
@@ -79,7 +85,6 @@ class SudokuGeneticRepresentation:
            self._data[3][2] == self._data[2][3]:
             sub_matrix_violated += 1
 
-        # (row_violated, col_violated, sub_matrix_violated)
         return (row_violated+col_violated+sub_matrix_violated)
 
     def __str__(self):
@@ -105,7 +110,7 @@ class Sudoku(threading.Thread):
         self._number_of_generation = number_of_generation
         self._sudoku = None
         self._poupolation = [SudokuGeneticRepresentation(
-            words, initial) for i in range(0, 250)]
+            words, initial) for i in range(0, 50)]
         self._scoring = []
 
     def run(self):
@@ -115,14 +120,18 @@ class Sudoku(threading.Thread):
             self.fitness_function()
             c = self.selection_new_couples()
             self.crossfunction(c)
-            # if current_generation % 10 == 0 and self._poupolation.__len__() >= 4:
-            #    self._poupolation.pop(self._poupolation.__len__()//2)
-            #    self._poupolation.pop(self._poupolation.__len__()//2)
 
             current_generation += 1
+            if current_generation % 15 == 0:
+                for i in range(0, 5):
+                    self._poupolation.append(SudokuGeneticRepresentation(
+                        ['a', 'b', 'c', 'd'], self._poupolation[0]._position_fixed))
 
+        print(time.ctime())
         print(len(self._poupolation))
-        print(self._poupolation[0])
+        for i in self._poupolation[0].data:
+            print(i)
+
         print(self._poupolation[1])
         print(self._scoring[0])
         print(self._scoring[1])
@@ -135,15 +144,15 @@ class Sudoku(threading.Thread):
 
         for element in self._poupolation:
             self._scoring.append(ScorePoint(element.fitness_value(), element))
+
         self._scoring.sort(key=lambda ScorePoint: ScorePoint[0])
 
     def selection_new_couples(self):
         # I do select the most fit, since they are ordered
         if self._scoring.__len__() >= 2:
-            couples = random.choices(self._scoring,
-                                     weights=[i for i in range(
-                                         len(self._scoring), 0, -1)],
-                                     k=len(self._scoring))
+            couples = random.sample(self._scoring[0:50],
+
+                                    k=20)
         else:
             return self._scoring
 
@@ -151,59 +160,69 @@ class Sudoku(threading.Thread):
 
     def crossfunction(self, couples):
         i = 0
-        last_index = self._poupolation.__len__()
+        spliting_point = random.randrange(1, 3)
 
+        current_index = self._poupolation.__len__()
         while i < len(couples)//2:
-            spliting_point = int(random.random()*2)+1
             first_cromo = couples[i][1].internal_use
-            first_half_fc = first_cromo[0:spliting_point]
+            first_half_fc = first_cromo[:spliting_point]
             second_half_fc = first_cromo[spliting_point:]
             second_cromo = couples[i+1][1].internal_use
-            first_half_sc = second_cromo[0:spliting_point]
+            first_half_sc = second_cromo[:spliting_point]
             second_half_sc = second_cromo[spliting_point:]
             temp = self.__combine_two_pieces(first_half_fc, second_half_sc)
             self.mutation(temp)
-            self._poupolation.append(temp)
+            self._poupolation.insert(3, temp)
             temp = self.__combine_two_pieces(first_half_sc, second_half_fc)
             self.mutation(temp)
-            self._poupolation.append(temp)
+            self._poupolation.insert(4, temp)
             i += 2
 
-        for i in (last_index, last_index-len(couples), -1):
-            self._poupolation.pop(i)
+        for k in range(len(self._poupolation)-current_index, current_index, -1):
+            self._poupolation.pop(k)
 
     def __combine_two_pieces(self, first_half_fc, second_half_fc):
+
         new_element = []
-        for i in first_half_fc:
-            new_element.append(i)
         for i in second_half_fc:
             new_element.append(i)
-        temp = SudokuGeneticRepresentation(['a', 'b', 'c', 'd'], [])
+        for i in first_half_fc:
+            new_element.append(i)
+
+        temp = SudokuGeneticRepresentation(
+            ['a', 'b', 'c', 'd'], self._poupolation[0]._position_fixed)
         temp.internal_use = new_element
         temp.in_sync_with_internal_use()
+
         return temp
 
     def mutation(self, element: SudokuGeneticRepresentation):
         # Can mutate just the gene that are not already part of the solution
         # Because the come from the users input
-        change_letter_in_square = int(random.random()*15)
-        new_letter = int(random.random()*3)
+        change_letter_in_square = random.randrange(0, 15)
 
         likely = random.random()
-        if likely > 0.5:
-            # Check fixed position later, do not forget
+        if likely <= 0.22:
+           # Check fixed position later, do not forget
             for f in element._position_fixed:
-                if f[0]+f[1] == change_letter_in_square:
+                if (f[0]+f[1])*4 == change_letter_in_square:
                     return
+            temp = set()
+            for i in (0, 3):
+                temp.add(element.data[change_letter_in_square//4][i])
 
-            element.data[int(change_letter_in_square)//4][int(
-                change_letter_in_square)//4] = list(element._mapping_word_to_bit.keys())[new_letter]
-            element.internal_use[int(change_letter_in_square)//4][int(
-                change_letter_in_square)//4] = list(element._mapping_word_to_bit.values())[new_letter]
+            present_words = set(element._mapping_word_to_bit.keys())
+            difference = list(present_words.difference(temp))
+            if len(difference) == 0:
+                return
+            new_letter = random.randrange(0, difference.__len__()-1)
+            element._internal_use[change_letter_in_square//4][
+                change_letter_in_square//4] = element._mapping_word_to_bit[difference[new_letter]]
+            element.in_sync_with_internal_use()
 
 
 if __name__ == "__main__":
-
+    random.seed(None)
     words = ['a', 'b', 'c', 'd']
     initial = [Box(2, 0, 'c'),
                Box(1, 1, 'b'),
@@ -211,5 +230,7 @@ if __name__ == "__main__":
                Box(2, 2, 'd')]
 
     # s = SudokuGeneticRepresentation(words, initial)
-    sudoku_genitico = Sudoku(20, words, initial)
+
+    print(time.ctime())
+    sudoku_genitico = Sudoku(291, words, initial)
     sudoku_genitico.start()

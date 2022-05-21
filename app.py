@@ -65,8 +65,7 @@ class SudokuApp:
         # Generate the result from the grid
         def generateSudoku():
             self.show_result.configure(text="Calculating solution...")
-            #self.calculating.place(relx=0.5, y=350, anchor=CENTER)
-            
+
             generations = 20
             Box = namedtuple('Box', "x y value")
             input_1 = self.input_1.get(1.0, "end-1c")
@@ -93,24 +92,26 @@ class SudokuApp:
                       [2, 2, input_11], [3, 2, input_12],
                       [0, 3, input_13], [1, 3, input_14],
                       [2, 3, input_15], [3, 3, input_16]]
-            
+
             def getWords(list):
                 return [item[2] for item in list if item[2] != '']
 
             def getPositions(list):
                 return [item for item in list if item[2] != '']
-            
+
             def generateInitial(list):
-                return [Box(item[0],item[1],item[2]) for item in list ]
+                return [Box(item[0], item[1], item[2]) for item in list]
 
             words = list(set(getWords(coords)))
             positions = getPositions(coords)
             initial = generateInitial(positions)
-            
+
             if len(words) < 4:
-                self.show_result.configure(text="Please enter a minimum of four unique letters.")
+                self.show_result.configure(text=("Please enter a minimum of "
+                                                 "four unique letters."))
             elif len(words) > 4:
-                self.show_result.configure(text="Please enter a maximum of four unique letters.")
+                self.show_result.configure(text=("Please enter a maximum of "
+                                                 "four unique letters."))
             else:
                 pass
 

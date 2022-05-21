@@ -109,7 +109,7 @@ class Sudoku(threading.Thread):
         threading.Thread.__init__(self)
         self._number_of_generation = number_of_generation
         self._sudoku = None
-        self._poupolation = [SudokuGeneticRepresentation(
+        self._population = [SudokuGeneticRepresentation(
             words, initial) for i in range(0, 50)]
         self._scoring = []
 
@@ -120,7 +120,6 @@ class Sudoku(threading.Thread):
             self.fitness_function()
             c = self.selection_new_couples()
             self.crossfunction(c)
-
             current_generation += 1
             if current_generation % 15 == 0:
                 for i in range(0, 5):
@@ -133,6 +132,9 @@ class Sudoku(threading.Thread):
             print(i)
 
         print(self._poupolation[1])
+        print(len(self._population))
+        print(self._population[0])
+        print(self._population[1])
         print(self._scoring[0])
         print(self._scoring[1])
 
@@ -142,7 +144,7 @@ class Sudoku(threading.Thread):
 
         self._scoring = []
 
-        for element in self._poupolation:
+        for element in self._population:
             self._scoring.append(ScorePoint(element.fitness_value(), element))
 
         self._scoring.sort(key=lambda ScorePoint: ScorePoint[0])

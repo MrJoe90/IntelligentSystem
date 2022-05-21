@@ -104,7 +104,7 @@ class Sudoku(threading.Thread):
         threading.Thread.__init__(self)
         self._number_of_generation = number_of_generation
         self._sudoku = None
-        self._poupolation = [SudokuGeneticRepresentation(
+        self._population = [SudokuGeneticRepresentation(
             words, initial) for i in range(0, 250)]
         self._scoring = []
 
@@ -115,15 +115,15 @@ class Sudoku(threading.Thread):
             self.fitness_function()
             c = self.selection_new_couples()
             self.crossfunction(c)
-            # if current_generation % 10 == 0 and self._poupolation.__len__() >= 4:
-            #    self._poupolation.pop(self._poupolation.__len__()//2)
-            #    self._poupolation.pop(self._poupolation.__len__()//2)
+            # if current_generation % 10 == 0 and self._population.__len__() >= 4:
+            #    self._population.pop(self._population.__len__()//2)
+            #    self._population.pop(self._population.__len__()//2)
 
             current_generation += 1
 
-        print(len(self._poupolation))
-        print(self._poupolation[0])
-        print(self._poupolation[1])
+        print(len(self._population))
+        print(self._population[0])
+        print(self._population[1])
         print(self._scoring[0])
         print(self._scoring[1])
 
@@ -133,7 +133,7 @@ class Sudoku(threading.Thread):
 
         self._scoring = []
 
-        for element in self._poupolation:
+        for element in self._population:
             self._scoring.append(ScorePoint(element.fitness_value(), element))
         self._scoring.sort(key=lambda ScorePoint: ScorePoint[0])
 
@@ -151,7 +151,7 @@ class Sudoku(threading.Thread):
 
     def crossfunction(self, couples):
         i = 0
-        last_index = self._poupolation.__len__()
+        last_index = self._population.__len__()
 
         while i < len(couples)//2:
             spliting_point = int(random.random()*2)+1
@@ -163,14 +163,14 @@ class Sudoku(threading.Thread):
             second_half_sc = second_cromo[spliting_point:]
             temp = self.__combine_two_pieces(first_half_fc, second_half_sc)
             self.mutation(temp)
-            self._poupolation.append(temp)
+            self._population.append(temp)
             temp = self.__combine_two_pieces(first_half_sc, second_half_fc)
             self.mutation(temp)
-            self._poupolation.append(temp)
+            self._population.append(temp)
             i += 2
 
         for i in (last_index, last_index-len(couples), -1):
-            self._poupolation.pop(i)
+            self._population.pop(i)
 
     def __combine_two_pieces(self, first_half_fc, second_half_fc):
         new_element = []

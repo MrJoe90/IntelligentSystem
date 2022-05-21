@@ -64,6 +64,9 @@ class SudokuApp:
 
         # Generate the result from the grid
         def generateSudoku():
+            self.show_result.configure(text="Calculating solution...")
+            #self.calculating.place(relx=0.5, y=350, anchor=CENTER)
+            
             generations = 20
             Box = namedtuple('Box', "x y value")
             input_1 = self.input_1.get(1.0, "end-1c")
@@ -82,37 +85,44 @@ class SudokuApp:
             input_14 = self.input_14.get(1.0, "end-1c")
             input_15 = self.input_15.get(1.0, "end-1c")
             input_16 = self.input_16.get(1.0, "end-1c")
-            coords = [[input_1, 0, 0], [input_2, 1, 0],
-                      [input_3, 2, 0], [input_4, 3, 0],
-                      [input_5, 0, 1], [input_6, 1, 1],
-                      [input_7, 2, 1], [input_8, 3, 1],
-                      [input_9, 0, 2], [input_10, 1, 2],
-                      [input_11, 2, 2], [input_12, 3, 2],
-                      [input_13, 0, 3], [input_14, 1, 3],
-                      [input_15, 2, 3], [input_16, 3, 3]]
-
+            coords = [[0, 0, input_1], [1, 0, input_2],
+                      [2, 0, input_3], [3, 0, input_4],
+                      [0, 1, input_5], [1, 1, input_6],
+                      [2, 1, input_7], [3, 1, input_8],
+                      [0, 2, input_9], [1, 2, input_10],
+                      [2, 2, input_11], [3, 2, input_12],
+                      [0, 3, input_13], [1, 3, input_14],
+                      [2, 3, input_15], [3, 3, input_16]]
+            
             def getWords(list):
-                return [item[0] for item in list if item[0] != '']
+                return [item[2] for item in list if item[2] != '']
 
             def getPositions(list):
-                return [item for item in list if item[0] != '']
+                return [item for item in list if item[2] != '']
+            
+            def generateInitial(list):
+                return [Box(item[0],item[1],item[2]) for item in list ]
 
-            words = getWords(coords)
+            words = list(set(getWords(coords)))
             positions = getPositions(coords)
-
-            initial = [Box(positions[0][1], positions[0][2], positions[0][0]),
-                       Box(positions[1][1], positions[1][2], positions[1][0]),
-                       Box(positions[2][1], positions[2][2], positions[2][0]),
-                       Box(positions[3][1], positions[3][2], positions[3][0])]
+            initial = generateInitial(positions)
+            
+            if len(words) < 4:
+                self.show_result.configure(text="Please enter a minimum of four unique letters.")
+            elif len(words) > 4:
+                self.show_result.configure(text="Please enter a maximum of four unique letters.")
+                self.missing_error.place(relx=0.5, y=350, anchor=CENTER)
+            else:
+                pass
 
             result = str(Sudoku(generations, words, initial))
             self.show_result.config(text="Result: "+result)
 
         self.submit_button = Button(window, text="Submit",
                                     command=generateSudoku)
-        self.submit_button.place(relx=0.5, y=300, anchor=CENTER)
-        self.show_result = Label(window, text="")
-        self.show_result.place(relx=0.5, y=350, anchor=CENTER)
+        self.submit_button.place(relx=0.5, y=350, anchor=CENTER)
+        self.show_result = Label(window, text="Click submit to see results.")
+        self.show_result.place(relx=0.5, y=300, anchor=CENTER)
 
 root = Tk()
 app = SudokuApp(root)

@@ -26,7 +26,7 @@ import unittest
 
 # Unit Tests
 class TestFloyd(unittest.TestCase):
-    # Test correct error message
+    # Test correct index error message
     def test_sudoku_one(self):
         with self.assertRaises(IndexError):
             generations = 20

@@ -112,7 +112,7 @@ class Sudoku(threading.Thread):
         self._number_of_generation = number_of_generation
         self._sudoku = None
         self._population = [SudokuGeneticRepresentation(
-            words, initial) for i in range(0, 300)]
+            words, initial) for i in range(0, 30)]
         self._scoring = []
 
     def run(self):
@@ -123,8 +123,13 @@ class Sudoku(threading.Thread):
             c = self.selection_new_couples()
             self.crossfunction(c)
             current_generation += 1
-            if current_generation % 15 == 0:
-                for i in range(0, 25):
+            if current_generation % 5 == 0:
+                # You don't have the new generation yet
+                self._scoring.sort(key=lambda ScorePoint: ScorePoint[0])
+                for i in range(self._scoring.__len__(), 10):
+                    self._population.pop(i)
+
+                for i in range(0, 5):
                     self._population.append(SudokuGeneticRepresentation(
                         ['a', 'b', 'c', 'd'], self._population[0]._position_fixed))
 
@@ -155,8 +160,8 @@ class Sudoku(threading.Thread):
         # I do select the most fit, since they are ordered
         if self._scoring.__len__() >= 2:
 
-            couples = random.choices(self._scoring, [w[0] for w in self._scoring],
-                                     k=30)
+            couples = random.sample(self._scoring,
+                                    k=8)
         else:
             return self._scoring
 
@@ -164,9 +169,9 @@ class Sudoku(threading.Thread):
 
     def crossfunction(self, couples):
         i = 0
-        spliting_point = random.randrange(1, 8)
         current_index = self._population.__len__()
         while i < len(couples)//2:
+            spliting_point = random.randrange(1, 8)
             first_cromo = couples[i][1].internal_use
             second_cromo = couples[i+1][1].internal_use
             first_half_fc = []
@@ -244,7 +249,7 @@ class Sudoku(threading.Thread):
         change_letter_in_col = random.randrange(0, 3)
 
         likely = random.random()
-        if likely <= 0.39:
+        if likely <= 0.23:
            # Check fixed position later, do not forget
             for f in element._position_fixed:
                 if f[0] == change_letter_in_row and f[1] == change_letter_in_col:
@@ -278,5 +283,5 @@ if __name__ == "__main__":
     # s = SudokuGeneticRepresentation(words, initial)
 
     print(time.ctime())
-    sudoku_genitico = Sudoku(250, words, initial)
+    sudoku_genitico = Sudoku(580, words, initial)
     sudoku_genitico.start()

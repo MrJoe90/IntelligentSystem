@@ -67,7 +67,7 @@ class SudokuApp:
         def generateSudoku():
             self.show_result.configure(text="Calculating solution...")
 
-            generations = 22
+            generations = 122
             Box = namedtuple('Box', "x y value")
             input_1 = self.input_1.get(1.0, "end-1c")
             input_2 = self.input_2.get(1.0, "end-1c")
@@ -85,14 +85,14 @@ class SudokuApp:
             input_14 = self.input_14.get(1.0, "end-1c")
             input_15 = self.input_15.get(1.0, "end-1c")
             input_16 = self.input_16.get(1.0, "end-1c")
-            coords = [[0, 0, input_1], [1, 0, input_5],
-                      [2, 0, input_9], [3, 0, input_13],
-                      [0, 1, input_2], [1, 1, input_6],
-                      [2, 1, input_10], [3, 1, input_14],
-                      [0, 2, input_3], [1, 2, input_7],
-                      [2, 2, input_11], [3, 2, input_15],
-                      [0, 3, input_4], [1, 3, input_8],
-                      [2, 3, input_12], [3, 3, input_16]]
+            coords = [[0, 0, input_1], [1, 0, input_2],
+                      [2, 0, input_3], [3, 0, input_4],
+                      [0, 1, input_5], [1, 1, input_6],
+                      [2, 1, input_7], [3, 1, input_8],
+                      [0, 2, input_9], [1, 2, input_10],
+                      [2, 2, input_11], [3, 2, input_12],
+                      [0, 3, input_13], [1, 3, input_14],
+                      [2, 3, input_15], [3, 3, input_16]]
 
             def getWords(list):
                 return [item[2] for item in list if item[2] != '']
@@ -115,18 +115,18 @@ class SudokuApp:
                                                  "four unique letters."))
             else:
                 pass
-
+            print(initial)
             solver = Sudoku(generations, words, initial)
             solver.start()
-            while solver.isAlive():
-                # actually it should wait different but there isn't any harm here
-                time.sleep(1)
+            while not solver.finish_event.is_set():
+                solver.finish_event.wait(1)
 
             sol = solver.solution
+
             for i in range(0, 4):
                 for j in range(0, 4):
-                    inputs[i][j].insert(1.0, sol[i][j][2])
-                print(sol[i])
+                    inputs[j][i].delete(1.0)
+                    inputs[j][i].insert(1.0, sol[i][j][2])
 
         self.submit_button = Button(window, text="Submit",
                                     command=generateSudoku)

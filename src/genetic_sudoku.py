@@ -1,10 +1,7 @@
-from operator import le
 import threading
 import random
 from collections import namedtuple
 import time
-
-from scipy import rand
 
 Box = namedtuple('Box', "x y value")
 
@@ -67,7 +64,7 @@ class SudokuGeneticRepresentation:
                     if self._data[j][i] == self._data[k][i]:
                         col_violated += 1
         # if row_violated <= 3 and col_violated <= 3:
-        if row_violated > 6 and col_violated > 6:
+        if row_violated > 1 and col_violated > 1:
             if row_violated+sub_matrix_violated >= col_violated+sub_matrix_violated:
                 return row_violated+sub_matrix_violated
             else:
@@ -118,19 +115,32 @@ class Sudoku(threading.Thread):
             words, initial) for i in range(0, 30)]
         self._scoring = []
         self._solution = []
+        self._finish_event = threading.Event()
+        self._finish_event.clear()
+        self._linked_score = 0  # Dreaming
+
+    @property
+    def finish_event(self):
+        return self._finish_event
 
     @property
     def solution(self):
         return self._solution
 
+    @property
+    def linked_score(self):
+        return self._linked_score
+
     def run(self):
         current_generation = 0
+        current_scoring = 1000
 
-        while current_generation < self._number_of_generation:
+        while current_generation < self._number_of_generation and current_scoring != 0:
             self.fitness_function()
             c = self.selection_new_couples()
             self.crossfunction(c)
             current_generation += 1
+            current_scoring = self._scoring[0]
             if current_generation % 5 == 0:
                 # You don't have the new generation yet
                 self._scoring.sort(key=lambda ScorePoint: ScorePoint[0])
@@ -139,24 +149,29 @@ class Sudoku(threading.Thread):
 
                 for i in range(0, 5):
                     self._population.append(SudokuGeneticRepresentation(
-                        ['a', 'b', 'c', 'd'], self._population[0]._position_fixed))
+                        [k for k, v in self._population[0]._mapping_word_to_bit.items()],
+                        self._population[0]._position_fixed))
 
         print(time.ctime())
         first_result = []
         m = 0
         l = 0
-        self._scoring.sort(key=lambda ScorePoint: ScorePoint[0])
+
         for i in self._scoring[0][1]._data:
             accum = []
             l = 0
             for j in i:
-                box = Box(m, l, self._scoring[0][1]._data[m][l])
+                box = Box(m, l, self._population[0]._data[m][l])
                 l += 1
                 accum.append(box)
             first_result.append(accum)
             m += 1
 
         self._solution = first_result
+        for i in self._solution:
+            print(i)
+        self._linked_score = self._scoring[0][0]
+        self.finish_event.set()
 
     def fitness_function(self):
         # Foreach element in the population
@@ -164,8 +179,9 @@ class Sudoku(threading.Thread):
 
         self._scoring = []
 
-        for element in self._population:
-            self._scoring.append(ScorePoint(element.fitness_value(), element))
+        for i in range(0, self._population.__len__()):
+            self._scoring.append(ScorePoint(
+                self._population[i].fitness_value(), self._population[i]))
 
         self._scoring.sort(key=lambda ScorePoint: ScorePoint[0])
 
@@ -247,7 +263,7 @@ class Sudoku(threading.Thread):
             new_element.append(acc)
 
         temp = SudokuGeneticRepresentation(
-            ['a', 'b', 'c', 'd'], self._population[0]._position_fixed)
+            [k for k, v in self._population[0]._mapping_word_to_bit.items()], self._population[0]._position_fixed)
         temp.internal_use = new_element
         temp.in_sync_with_internal_use()
 
@@ -265,6 +281,7 @@ class Sudoku(threading.Thread):
             for f in element._position_fixed:
                 if f[0] == change_letter_in_row and f[1] == change_letter_in_col:
                     return
+
             temp = set()
             for i in (0, 3):
                 temp.add(element.data[change_letter_in_col][i])
@@ -283,17 +300,18 @@ class Sudoku(threading.Thread):
             element.in_sync_with_internal_use()
 
 
+""""
 if __name__ == "__main__":
     random.seed(None)
     words = ['a', 'b', 'c', 'd']
     initial = [Box(2, 0, 'c'),
                Box(1, 1, 'b'),
                Box(1, 3, 'a'),
-               Box(3, 1, 'd'),
-               Box(3, 2, 'a'), ]
+               Box(2, 2, 'd'), ]
 
     # s = SudokuGeneticRepresentation(words, initial)
 
     print(time.ctime())
-    sudoku_genitico = Sudoku(315, words, initial)
+    sudoku_genitico = Sudoku(22, words, initial)
     sudoku_genitico.start()
+"""

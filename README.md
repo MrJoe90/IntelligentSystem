@@ -14,6 +14,7 @@ For example, if provided with the four letter word "WORD" we can use this functi
 The word must have a unique set of letters and can only be four letters long.
 
 ## Directory
+The directory shows the location of files within this repositiory.
 ```
 C:.
 ├───LICENSE
@@ -23,6 +24,9 @@ C:.
 │
 ├───src
 │   └───genetic_sudoku.py
+├───src
+│   ├───brief.md
+│   └───genetic_algorithm_psuedocode
 │
 └───tests
     ├───accuracy_tests.py
@@ -52,7 +56,8 @@ To run the application, type the following into the terminal:
 python app.py
 ```
 
-//add gifs of application here once able//
+The below shows an example session with the application.
+![](https://i.imgur.com/j2SdBfI.gif)
 
 ## Testing
 In order to ensure there are no detrimental changes to the genetic algorithm, the following tests can be run.
@@ -60,17 +65,20 @@ In order to ensure there are no detrimental changes to the genetic algorithm, th
 ### Runnning Unit Tests
 To run the unit tests use the following in the terminal for the test_cases.py file, or substitute with your own test cases.
 ```
-python -m unittest tests/test_cases.py
+python -m unittest tests/unit_tests.py
 ```
 
 ### Runnning Performance Tests
 To run the performance tests use the following in the terminal for the test_cases.py file, or substitute with your own test cases.
 ```
-python -m cProfile tests/test_cases.py
+python -m cProfile tests/performance_tests.py
 ```
 
 ### Runnning Accuracy Tests
-//Fill in once completed//
+To run the accuracy tests use the following in the terminal for the test_cases.py file, or substitute with your own test cases.
+```
+python tests/accuracy_tests.py
+```
 
 ## Contributing
 Pull requests permitted. When contributing please update the test directory as appropriate with any additional requirements. 

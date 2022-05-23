@@ -8,6 +8,9 @@ Code version: 1.0
 Availability:
 https://stackoverflow.com/questions/16981921/relative-imports-in-python-3
 """
+from tests.test_cases import (answer_e)
+from tests.test_cases import (initial_d, initial_e)
+from tests.test_cases import (word_d, word_e)
 import unittest
 from tests.test_cases import (initial_a, initial_b, initial_c, initial_d)
 from tests.test_cases import (word_a, word_b, word_c, word_d)
@@ -20,7 +23,6 @@ sys.path.append(os.path.dirname(SCRIPT_DIR))
 # Import the Sudoku functions
 
 # Import the test cases
-
 # Import Testing package
 
 
@@ -28,15 +30,16 @@ sys.path.append(os.path.dirname(SCRIPT_DIR))
 class TestFloyd(unittest.TestCase):
     # Test correct index error message
     def test_sudoku_one(self):
-        with self.assertRaises(IndexError):
-            generations = 20
+        with self.assertRaises(ValueError):
+            generations = 600
             Sudoku(generations, word_d, initial_d)
 
-    def test_sudoku_two(self):
-        generations = 20
-        # need to add into here a test to check output is as expected
-
-    # Test correct output
+    # Currently unable to test correct output
+    # def test_sudoku_two(self):
+    #    generations = 20
+    #    solution = Sudoku(generations, word_e, initial_e)
+    #    print(solution)
+    #    self.assertEqual(answer_e, solution)
 
 
 if __name__ == '__main__':

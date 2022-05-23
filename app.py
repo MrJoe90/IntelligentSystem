@@ -1,4 +1,5 @@
 # Import UI packages
+import re
 import tkinter as tk
 from tkinter import *
 
@@ -106,6 +107,10 @@ class SudokuApp:
             words = list(set(getWords(coords)))
             positions = getPositions(coords)
             initial = generateInitial(positions)
+
+            print(words)
+            print(positions)
+            print(initial)
 
             if len(words) < 4:
                 self.show_result.configure(text=("Please enter a minimum of "

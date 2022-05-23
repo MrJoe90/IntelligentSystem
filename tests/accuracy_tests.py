@@ -8,13 +8,17 @@ Code version: 1.0
 Availability:
 https://stackoverflow.com/questions/16981921/relative-imports-in-python-3
 """
-from tests.test_cases import (initial_a, initial_b, initial_c)
-from tests.test_cases import (word_a, word_b, word_c)
-from src.genetic_sudoku import Sudoku
-import sys
 import os
+import sys
+from test_cases import (word_a, word_b, word_c)
+from test_cases import (initial_a, initial_b, initial_c)
+from IntelligentSystem.src.genetic_sudoku import Sudoku
+
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+
 sys.path.append(os.path.dirname(SCRIPT_DIR))
+
+
 # Import the Sudoku functions
 
 # Import the test cases

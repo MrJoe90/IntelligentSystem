@@ -34,7 +34,7 @@ while tests < 200:
     tests += 1
 
 while tests < 200:
-    solver = Sudoku(600, word_a, initial_b)
+    solver = Sudoku(600, word_b, initial_b)
     solver.start()
     while not solver.finish_event:
         solver.finish_event.wait(1)
@@ -44,7 +44,7 @@ while tests < 200:
     tests += 1
 
 while tests < 200:
-    solver = Sudoku(600, word_a, initial_c)
+    solver = Sudoku(600, word_c, initial_c)
     solver.start()
     while not solver.finish_event:
         solver.finish_event.wait(1)

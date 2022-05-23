@@ -1,4 +1,5 @@
 # Import UI packages
+import re
 import tkinter as tk
 from tkinter import *
 
@@ -107,6 +108,10 @@ class SudokuApp:
             positions = getPositions(coords)
             initial = generateInitial(positions)
 
+            print(words)
+            print(positions)
+            print(initial)
+
             if len(words) < 4:
                 self.show_result.configure(text=("Please enter a minimum of "
                                                  "four unique letters."))
@@ -116,17 +121,9 @@ class SudokuApp:
             else:
                 pass
 
-            solver = Sudoku(generations, words, initial)
-            solver.start()
-            while solver.isAlive():
-                # actually it should wait different but there isn't any harm here
-                time.sleep(1)
-
-            sol = solver.solution
-            for i in range(0, 4):
-                for j in range(0, 4):
-                    inputs[i][j].insert(1.0, sol[i][j][2])
-                print(sol[i])
+            result = Sudoku(generations, words, initial)
+            solution = str(result._population[0])
+            self.show_result.config(text="Result: "+solution)
 
         self.submit_button = Button(window, text="Submit",
                                     command=generateSudoku)

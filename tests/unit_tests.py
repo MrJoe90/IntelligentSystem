@@ -28,7 +28,7 @@ import unittest
 class TestFloyd(unittest.TestCase):
     # Test correct index error message
     def test_sudoku_one(self):
-        with self.assertRaises(IndexError):
+        with self.assertRaises(ValueError):
             generations = 600
             Sudoku(generations, word_d, initial_d)
 
